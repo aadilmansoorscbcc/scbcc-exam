@@ -1,11 +1,152 @@
-<!DOCTYPE html>
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SCBCC Examination Seat Management System</title>
+<<<<<<< HEAD
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a1a3a, #1e2a44);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #ffffff;
+        }
+        .container {
+            background: rgba(30, 42, 68, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            text-align: center;
+        }
+        h1 {
+            color: #00aaff;
+            font-size: 2em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 6px rgba(0, 170, 255, 0.5);
+        }
+        .search-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        #searchInput {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            background: #2c3e50;
+            color: #ffffff;
+            outline: none;
+            transition: box-shadow 0.3s ease;
+        }
+        #searchInput:focus {
+            box-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
+        }
+        #searchButton {
+            padding: 10px 20px;
+            background: #00aaff;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        #searchButton:hover {
+            background: #0088cc;
+            transform: translateY(-2px);
+        }
+        #candidateDetails {
+            margin-top: 20px;
+        }
+        .candidate-card {
+            background: #2c3e50;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            color: #ecf0f1;
+            transition: transform 0.3s ease;
+        }
+        .candidate-card:hover {
+            transform: translateY(-5px);
+        }
+        .candidate-card h3 {
+            margin: 0 0 10px;
+            color: #00aaff;
+            font-size: 1.3em;
+        }
+        .candidate-card p {
+            margin: 5px 0;
+        }
+        .message {
+            margin-top: 10px;
+            color: #bdc3c7;
+            font-style: italic;
+        }
+        @media (max-width: 600px) {
+            .container { padding: 20px; }
+            h1 { font-size: 1.8em; }
+            #searchInput { width: 100%; }
+        }
+    </style>
+=======
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+>>>>>>> ec6730d5521c8c5082ba8b7e1e20035afcdc1d84
 </head>
 <body>
     <div class="container">
@@ -18,7 +159,96 @@
         <div id="candidateDetails"></div>
     </div>
 
+<<<<<<< HEAD
+    <script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+    </script>
+    <script>
+        let candidatesIndex = new Map();
+
+        // Load candidates from localStorage
+        const storedCandidates = localStorage.getItem('candidatesIndex');
+        if (storedCandidates) {
+            candidatesIndex = new Map(JSON.parse(storedCandidates));
+        }
+
+        function searchCandidate() {
+            const query = document.getElementById('searchInput').value.trim();
+            const candidateDetails = document.getElementById('candidateDetails');
+            candidateDetails.innerHTML = '';
+
+            if (!query) {
+                candidateDetails.innerHTML = '<p class="message">Please enter a Roll No or Reg No.</p>';
+                return;
+            }
+
+            if (candidatesIndex.size === 0) {
+                candidateDetails.innerHTML = '<p class="message">Data not loaded. Please ask the admin to load the data in the backend.</p>';
+                return;
+            }
+
+            const candidate = candidatesIndex.get(query);
+            if (!candidate) {
+                candidateDetails.innerHTML = '<p class="message">No candidate found.</p>';
+                return;
+            }
+
+            const card = document.createElement('div');
+            card.className = 'candidate-card';
+            card.innerHTML = `
+                <h3>${candidate.name || 'N/A'}</h3>
+                <p>S.No: ${candidate.sno || 'N/A'}</p>
+                <p>Roll No: ${candidate.rollNo || 'N/A'}</p>
+                <p>Reg No: ${candidate.regNo || 'N/A'}</p>
+                <p>Room: ${candidate.roomNo || 'Not Assigned'}</p>
+                <p>Subject: ${candidate.subject || 'N/A'}</p>
+                <p>College Code: ${candidate.collegeCode || 'N/A'}</p>
+                <p>Gender: ${candidate.gender === 'm' ? 'Male' : candidate.gender === 'f' ? 'Female' : 'N/A'}</p>
+                <p class="message">For bench positioning, see the room chart of your assigned room.</p>
+            `;
+            candidateDetails.appendChild(card);
+        }
+    </script>
+=======
     <script src="fileLoader.js"></script>
     <script src="app.js"></script>
+>>>>>>> ec6730d5521c8c5082ba8b7e1e20035afcdc1d84
 </body>
 </html>
