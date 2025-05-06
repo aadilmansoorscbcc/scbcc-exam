@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCBCC Admin - Upload Excel</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>SCBCC Admin - Upload Candidate Data</h1>
+        <div class="search-section">
+            <input type="file" id="excelFile" accept=".xlsx">
+            <button id="uploadButton" onclick="uploadExcel()">Upload</button>
+        </div>
+        <div id="uploadStatus"></div>
+    </div>
+    <script>
+        async function uploadExcel() {
+            const fileInput = document.getElementById('excelFile');
+            const uploadStatus = document.getElementById('uploadStatus');
+            uploadStatus.innerHTML = '<p class="message">Uploading...</p>';
+
+            if (!fileInput.files.length) {
+                uploadStatus.innerHTML = '<p class="message">Please select an Excel file.</p>';
+                return;
+            }
+
+            const file = fileInput.files[0];
+            if (file.size > 1048576) { // 1 MB limit
+                uploadStatus.innerHTML = '<p class="message">File size exceeds 1 MB.</p>';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = async function (e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[sheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+                    const candidates = jsonData.map(row => ({
+                        name: row['Name'] || '',
+                        sno: row['S.No'] || '',
+                        roll_no: row['Roll No'] || '',
+                        reg_no: row['Reg No'] || '',
+                        room_no: row['Room No'] || '',
+                        bench_no: row['Bench No'] || '',
+                        subject: row['Subject'] || '',
+                        college_code: row['College Code'] || '',
+                        gender: row['Gender'] ? row['Gender'].toLowerCase()[0] : ''
+                    }));
+
+                    // Clear existing data
+                    await fetch('https://your-supabase-project-id.supabase.co/rest/v1/exam_candidates', {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': 'your-supabase-anon-key',
+                            'Authorization': 'Bearer your-supabase-anon-key'
+                        }
+                    });
+
+                    // Insert new data
+                    const response = await fetch('https://your-supabase-project-id.supabase.co/rest/v1/exam_candidates', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': 'your-supabase-anon-key',
+                            'Authorization': 'Bearer your-supabase-anon-key'
+                        },
+                        body: JSON.stringify(candidates)
+                    });
+
+                    if (response.ok) {
+                        uploadStatus.innerHTML = '<p class="message">Data uploaded successfully!</p>';
+                    } else {
+                        uploadStatus.innerHTML = '<p class="message">Upload failed. Please try again.</p>';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    uploadStatus.innerHTML = '<p class="message">Error uploading data. Please try again.</p>';
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+    </script>
+</body>
+</html>
