@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SCBCC Examination Seat Management System</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -13,9 +14,11 @@
             <input type="text" id="searchInput" placeholder="Enter Roll No or Reg No">
             <button id="searchButton" onclick="searchCandidate()">Search</button>
         </div>
+        <div id="loadingSpinner" class="spinner hidden"></div>
         <div id="candidateDetails"></div>
     </div>
-    <script src="/static/js/xlsx.full.min.js"></script>
-    <script src="/static/js/main.js"></script>
+
+    <script src="fileLoader.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
